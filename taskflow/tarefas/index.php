@@ -14,11 +14,21 @@ require '../includes/header.php'; ?><div class="head">
     </div><a class="btn" href="form.php">+ Nova tarefa</a>
 </div>
 <section class="panel">
-    <form method="get" style="display:flex;gap:10px;align-items:end">
-        <div class="field"><label>Filtrar por status</label><select name="status">
-                <option value="">Todos</option><?php foreach (['Pendente', 'Em andamento', 'Concluída'] as $s): ?><option <?= $status === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?>
-            </select></div><button class="btn gray">Filtrar</button>
-    </form>
+  <form method="get" style="display:flex;gap:10px;align-items:end">
+    <div class="field">
+        <label>Filtrar por status</label>
+        <select name="status">
+            <option value="">Todos</option>
+            <?php foreach (['Pendente', 'Em andamento', 'Concluída'] as $s): ?>
+                <option value="<?= htmlspecialchars($s) ?>"
+                    <?= $status === $s ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($s) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <button type="submit" class="btn gray">Filtrar</button>
+</form>
     <div class="scroll">
         <table>
             <tr>
