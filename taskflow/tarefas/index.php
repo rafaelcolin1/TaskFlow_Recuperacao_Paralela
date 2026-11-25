@@ -34,7 +34,8 @@ require '../includes/header.php'; ?><div class="head">
                     <td><?= date('d/m/Y', strtotime($t['prazo'])) ?></td>
                     <td><?= $t['prioridade'] ?></td>
                     <td><?= $t['status'] ?></td>
-                    <td><a class="btn gray" href="form.php?id=<?= $t['id'] ?>">Editar</a> <a class="btn red" href="excluir.php?id=<?= $t['id'] ?>">Excluir</a></td>
+                    <td><a class="btn gray" href="form.php?id=<?= $t['id'] ?>">Editar</a>
+                    <?php if ($t['id']):  ?><button onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')"><a class="btn red" href="excluir.php?id=<?= $t['id'] ?>">Excluir</a></button></td> <?php endif; ?>
                 </tr><?php endforeach; ?>
         </table>
     </div>
