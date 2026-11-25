@@ -1,16 +1,44 @@
 <?php require '../config/database.php';
-$id = (int)($_GET['id'] ?? 0);
+$id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 $t = ['titulo' => '', 'descricao' => '', 'responsavel' => '', 'categoria' => 'Geral', 'prazo' => date('Y-m-d'), 'prioridade' => 'Média', 'status' => 'Pendente'];
 if ($id) {
     $q = $pdo->prepare('SELECT * FROM tarefas WHERE id=?');
     $q->execute([$id]);
     $t = $q->fetch() ?: $t;
 }
+
+if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST') {
+    $titulo = trim($_POST['titulo'] ?? '');
+    $descricao = trim($_POST['descricao'] ?? '');
+    $responsavel = trim($_POST['responsavel'] ?? '');
+    $categoria = $_POST['categoria'] ?? 'Geral';
+    $prazo = $_POST['prazo'] ?? date('Y-m-d');
+    $prioridade = $_POST['prioridade'] ?? 'Média';
+    $status = $_POST['status'] ?? 'Pendente';
+
+    if ($titulo === '' || $responsavel === '') {
+        header("Location: form.php?id=$id&erro=1");
+        exit;
+    }
+
+    if ($id) {
+        $q = $pdo->prepare('UPDATE tarefas SET titulo=?, descricao=?, responsavel=?, categoria=?, prazo=?, prioridade=?, status=? WHERE id=?');
+        $q->execute([$titulo, $descricao, $responsavel, $categoria, $prazo, $prioridade, $status, $id]);
+    } else {
+        $q = $pdo->prepare('INSERT INTO tarefas (titulo, descricao, responsavel, categoria, prazo, prioridade, status) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        $q->execute([$titulo, $descricao, $responsavel, $categoria, $prazo, $prioridade, $status]);
+    }
+
+    header('Location: index.php');
+    exit;
+}
+
 $pageTitle = $id ? 'Editar tarefa' : 'Nova tarefa';
 require '../includes/header.php'; ?><div class="head">
+    
     <h1><?= $pageTitle ?></h1><a class="btn gray" href="index.php">Voltar</a>
 </div><?php if (isset($_GET['erro'])): ?><p class="alert">Erro ao gravar. Verifique os dados.</p><?php endif; ?><section class="panel">
-    <form method="post" action="salvar.php" class="grid"><input type="hidden" name="id" value="<?= $id ?>">
+    <form method="post" action="form.php<?= $id ? '?id=' . $id : '' ?>" class="grid">
         <div class="field full"><label>Título *</label><input name="titulo" required value="<?= htmlspecialchars($t['titulo']) ?>"></div>
         <div class="field full"><label>Descrição</label><textarea name="descricao"><?= htmlspecialchars($t['descricao']) ?></textarea></div>
         <div class="field"><label>Responsável *</label><input name="responsavel" required value="<?= htmlspecialchars($t['responsavel']) ?>"></div>
